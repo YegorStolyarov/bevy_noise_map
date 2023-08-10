@@ -69,7 +69,7 @@ fn generate_world(
     let (grid_width, grid_height) = map.size();
     debug!("Map size: {}x{}", grid_width, grid_height);
 
-    let tile_size = 64_f32;
+    let tile_size = 32_f32;
 
     let start_x = -(grid_width as f32) * tile_size / 2.0;
     let start_y = -(grid_height as f32) * tile_size / 2.0;

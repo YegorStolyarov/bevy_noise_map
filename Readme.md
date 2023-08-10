@@ -10,3 +10,10 @@ For showcase, I used simple color tiles, feel free to use any tilesets you want,
 |---------------|--------------|
 | 0.1 (current) | 0.11         |
 | -             | -            |
+
+![Generated level][ex image]
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
+[ex image]: /images/example.png
