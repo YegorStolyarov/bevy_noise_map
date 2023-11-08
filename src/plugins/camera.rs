@@ -6,7 +6,7 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::Finished), setup_camera);
+        app.add_systems(OnEnter(AppState::Setup), setup_camera);
         app.add_systems(Update, camera_movement_system.run_if(
             in_state(AppState::Finished)
         ));

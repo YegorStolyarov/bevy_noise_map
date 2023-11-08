@@ -1,6 +1,8 @@
 This is example project, showing how to use Perlin Noise for procedural generation of terrain from 2d tiles.
 For different noises explore [Noise repo](https://github.com/Razaekel/noise-rs).
 
+Use `WASD` to move camera, `ZX` to zoom, ui button to reset map.
+
 All map-building logic located in ```main.rs``` for easier exploration.
 (While running this project, you can move camera with WASD)
 

@@ -13,6 +13,7 @@ mod plugins;
 pub mod common;
 
 use crate::common::AppState;
+use plugins::ui::ResetMapEvent;
 
 
 fn main() {
@@ -23,10 +24,13 @@ fn main() {
                 level: Level::DEBUG,
                 filter: "wgpu=error,naga=error,bevy_render=error,bevy_app=info,bevy_ecs=info".to_string()
             }),
-            plugins::camera::CameraPlugin
+            plugins::camera::CameraPlugin,
+            plugins::ui::UiPlugin
         )) // prevents blurry sprites
         .add_state::<AppState>()
-        .add_systems(OnEnter(AppState::Setup), generate_world)
+        .add_systems(OnEnter(AppState::Build), generate_world)
+        .add_systems(OnExit(AppState::Finished), cleanup)
+        .add_systems(Update, reset.run_if(in_state(AppState::Finished)))
         .run();
 }
 
@@ -61,6 +65,9 @@ fn get_color(val: f64) -> Color {
     color_result.expect("Getting color from HEX error")
 }
 
+#[derive(Resource, Deref)]
+struct Root(Entity);
+
 fn generate_world(
     mut commands: Commands,
     mut next_state: ResMut<NextState<AppState>>
@@ -74,27 +81,50 @@ fn generate_world(
     let start_x = -(grid_width as f32) * tile_size / 2.0;
     let start_y = -(grid_height as f32) * tile_size / 2.0;
 
-    for col_x in 0..grid_width {
-        for col_y in 0..grid_height {
-            let val = map.get_value(col_x, col_y);
-            // if val > 0.8_f64 {
-                // debug!("Value for {}:{} = {}", col_x, col_y, val);
-            // }
-            let x = start_x + col_x as f32 * tile_size;
-            let y = start_y + col_y as f32 * tile_size;
+    let root = commands.spawn(
+        SpatialBundle::default()
+    ).with_children(|parent| {
+        for col_x in 0..grid_width {
+            for col_y in 0..grid_height {
+                let val = map.get_value(col_x, col_y);
+                // if val > 0.8_f64 {
+                    // debug!("Value for {}:{} = {}", col_x, col_y, val);
+                // }
+                let x = start_x + col_x as f32 * tile_size;
+                let y = start_y + col_y as f32 * tile_size;
 
-            commands.spawn(
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: get_color(val),
-                        custom_size: Some(Vec2::new(tile_size, tile_size)),
+                parent.spawn(
+                    SpriteBundle {
+                        sprite: Sprite {
+                            color: get_color(val),
+                            custom_size: Some(Vec2::new(tile_size, tile_size)),
+                            ..default()
+                        },
+                        transform: Transform::from_translation(Vec3::new(x, y, 0.)),
                         ..default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(x, y, 0.)),
-                    ..default()
-                }
-            );
+                    }
+                );
+            }
         }
+    }).id();
+
+    commands.insert_resource(Root(root));
+
+    next_state.set(AppState::Finished);
+}
+
+fn cleanup(
+    mut commands: Commands,
+    root: Res<Root>
+) {
+    commands.entity(**root).despawn_recursive();
+}
+
+fn reset(
+    mut events: EventReader<ResetMapEvent>,
+    mut next_state: ResMut<NextState<AppState>>
+) {
+    for _ in events.read() {
+        next_state.set(AppState::Build);
     }
-     next_state.set(AppState::Finished);
 }
