@@ -20,10 +20,10 @@ fn setup_camera(mut commands: Commands) {
 
 pub fn camera_movement_system(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, With<Camera>>,
+    mut query: Query<(&mut Transform, &mut OrthographicProjection), With<Camera>>,
     time: Res<Time>,
 ) {
-    if let Ok(mut transform) = query.get_single_mut() {
+    if let Ok((mut transform, mut ortho)) = query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
         if keyboard_input.pressed(KeyCode::W) {
@@ -40,6 +40,18 @@ pub fn camera_movement_system(
 
         if keyboard_input.pressed(KeyCode::D) {
             direction.x += 1.0;
+        }
+
+        if keyboard_input.pressed(KeyCode::Z) {
+            ortho.scale += 0.1;
+        }
+
+        if keyboard_input.pressed(KeyCode::X) {
+            ortho.scale -= 0.1;
+        }
+
+        if ortho.scale < 0.5 {
+            ortho.scale = 0.5;
         }
 
         let translation = &mut transform.translation;
