@@ -10,7 +10,7 @@ For showcase, I used simple color tiles, feel free to use any tilesets you want,
 
 | Version       | Bevy Version |
 |---------------|--------------|
-| 0.1 (current) | 0.11         |
+| 0.1 (current) | 0.12         |
 | -             | -            |
 
 ### Level generated with this example:
